@@ -69,9 +69,9 @@ module.exports = (robot) ->
         client.subscribe(topics[itopic])
   if ! subscriptions?
     subscriptions = {}
-    subscriptions['#mqtt'] = []
+    subscriptions['mqtt'] = []
   if topic?
-    subscriptions['#mqtt'].push(topic) # subscribe to the initial env topic in #mqtt if given
+    subscriptions['mqtt'].push(topic) # subscribe to the initial env topic in #mqtt if given
 
   robot.respond /mqtt subscribe (.*)/i, (message) ->
     room = message.message.room
