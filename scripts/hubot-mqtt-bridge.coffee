@@ -52,7 +52,6 @@ mqttOptions =
 mqttClient = mqtt.connect(mqttUrl, mqttOptions)
 
 mqttClient.on 'connect', ->
-  #console.log "Connected to MQTT broker (v2)."
   console.log "Connected to MQTT broker @ #{process.env.HUBOT_MQTT_HOST}:#{process.env.HUBOT_MQTT_PORT}"
 
 outTopic = process.env.HUBOT_MQTT_OUT_TOPIC
@@ -135,7 +134,7 @@ module.exports = (robot) ->
     mqttClient.publish( message.match[1], message.match[2] )
 
   robot.respond /mqtt reconnect/i, (message) ->
-    mqttClient = mqttClient.connect(process.env.HUBOT_MQTT_URL, options)
+    mqttClient = mqtt.connect(process.env.HUBOT_MQTT_URL, options)
 
   robot.respond /mqtt (subscriptions|subscribed|topics)/i, (message) ->
     room = message.message.room
