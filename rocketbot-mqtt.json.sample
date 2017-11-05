@@ -1,0 +1,30 @@
+{
+        "apps": [{
+                "name": "rocketbot-mqtt",
+                "max_memory_restart": "512M",
+                "log_date_format": "YYYY-MM-DD HH:mm:ss SSS",
+                "script": "bin/hubot",
+                "exec_interpreter": "bash",
+                "args": "--name rocketcat --adapter rocketchat",
+                "watch": ["package.json", "external-scripts.json", "scripts/"],
+                "out_file": "logs/app.log",
+                "error_file": "logs/err.log",
+                "port": "8079",
+                "env": {
+                    "ROCKETCHAT_URL": "https://chat.aloes.io",
+                        "ROCKETCHAT_USER": "dave",
+                        "ROCKETCHAT_ROOM": LOGS,
+                        "ROCKETCHAT_PASSWORD": "",
+                        "ROCKETCHAT_AUTH":"password",
+                        "PORT": "8079",
+                        "LISTEN_ON_ALL_PUBLIC": "true",
+                        "RESPOND_TO_DM": "true",
+                        "RESPOND_TO_EDITED": "true",
+			"HUBOT_LOG_LEVEL": "debug",
+                        "HUBOT_MQTT_URL": "mqtt://localhost",
+                        "HUBOT_MQTT_PORT": "1883",
+			"HUBOT_MQTT_TOPIC": "",
+                }
+        }]
+}
+
