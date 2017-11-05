@@ -32,5 +32,6 @@ bin
 .editorconfig
 pm2.json
 rocketbot-mqtt.json
+launch.sh
 
 .DS_Store
