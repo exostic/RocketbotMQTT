@@ -18,6 +18,7 @@
 
 fs = require('fs')
 mqtt = require('mqtt')
+mqttPattern = require("mqtt-pattern");
 
 mqttUrl = process.env.HUBOT_MQTT_URL
 HOST = process.env.HUBOT_MQTT_HOST
@@ -78,6 +79,11 @@ module.exports = (robot) ->
 
  # MQTT Bridging
   
+  # Wildcards in patterns don't need names
+  pattern = "device/+id/+/#data"
+  topic = "device/fitbit/heartrate/rate/bpm"
+  params = mqttPattern.exec(pattern, topic)
+
   subscriptions = robot.brain.get('mqtt-subscriptions')
   if subscriptions?
     for room, topics of subscriptions
