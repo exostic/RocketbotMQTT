@@ -77,12 +77,12 @@ module.exports = (robot) ->
   robot.respond /show room/, (res) ->
     res.reply "The room's ID is #{res.message.room}."
 
- # MQTT Bridging
+# MQTT Bridging
   
   # Wildcards in patterns don't need names
-  pattern = "device/+id/+/#data"
-  topic = "device/fitbit/heartrate/rate/bpm"
-  params = mqttPattern.exec(pattern, topic)
+  #pattern = "hermes/+component/+/#data"
+  #topic = "device/fitbit/heartrate/rate/bpm"
+  #params = mqttPattern.exec(pattern, topic)
 
   subscriptions = robot.brain.get('mqtt-subscriptions')
   if subscriptions?
@@ -93,7 +93,7 @@ module.exports = (robot) ->
     subscriptions = {}
     subscriptions[outTopic] = []
   if topic?
-    subscriptions[outTopic].push(topic) # subscribe to the initial env topic in #mqtt if given
+    subscriptions[outTopic].push(topic) # subscribe to the initial env topic if given
  
   mqttClient.on('message', (topic,message) ->
     #message.send("[#{topic}] #{message}")
@@ -121,7 +121,7 @@ module.exports = (robot) ->
     topic = message.match[1]
     room = message.message.room
     mqttClient.unsubscribe(topic)
-    message.send("#{room} unsubscribed from #{topic}")
+   # message.send("#{room} unsubscribed from #{topic}")
     if ! subscriptions[room]?
       subscriptions[room] = []
     index = subscriptions[room].indexOf(topic)
