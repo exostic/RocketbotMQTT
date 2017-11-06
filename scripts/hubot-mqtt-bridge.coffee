@@ -12,7 +12,7 @@
 #   hubot mqtt publish <topic> <message>   - Publish a message on a topic
 #   hubot mqtt subscribe <topic>           - Subscribe to a topic
 #   hubot mqtt unsubscribe <topic>         - Unsubscribe to a topic
-#
+#   hubot mqtt reconnect                   - Reconnect to MQTT Broker
 # Notes:
 #   <optional notes required for the script>
 
@@ -60,22 +60,15 @@ inTopic = process.env.HUBOT_MQTT_IN_TOPIC
 mqttClient.subscribe(outTopic)
 
 module.exports = (robot) ->
+
   robot.respond /hello/, (res) ->
     res.reply "hello!"
 
   robot.hear /orly/, (res) ->
     res.send "yarly"
 
-  robot.respond /keyboard/i, (res) ->
-    res.envelope.telegram = { reply_markup: { keyboard: [ [ "option1", "option2" ] ] } }
-    res.reply "Select the option from the keyboard specified."
-
-  robot.respond /ask me/i, (res) ->
-    res.envelope.telegram = { reply_markup: { keyboard: [ [ "answer1", "answer2" ] ] } }
-    res.reply "What is your answer?"
-
   robot.hear /keyword/i, (req) ->
-    req.envelope.telegram = { reply_markup: { keyboard: [ [ "Yes", "No" ] ] } }
+    res.send({ reply_markup: { keyboard: [ [ "Yes", "No" ] ] } })
     req.send "I heard the keyword, am I right?"
 
 # Utilities
@@ -98,40 +91,41 @@ module.exports = (robot) ->
  
   mqttClient.on('message', (topic,message) ->
     #message.send("[#{topic}] #{message}")
-    robot.messageRoom(outTopic, "[#{topic}] #{message}")
+    robot.messageRoom(outTopic, "received #{message} from [#{topic}]")
     for room, topics of subscriptions
       for itopic of topics
         reg = new RegExp(topics[itopic].replace('+', '[^\/]+').replace('#', '.+') + '$');
         matches = topic.match(reg);
         if(matches)
-          robot.messageRoom(room, "[#{topic}] #{message}")
+          robot.messageRoom(room, "received #{message} from [#{topic}]")
   )
 
   robot.respond /mqtt subscribe (.*)/i, (message) ->
     room = message.message.room
     topic = message.match[1]
     mqttClient.subscribe(message.match[1])
+    message.send("#{room} subscribed to #{topic}")
     if ! subscriptions[room]?
       subscriptions[room] = []
     subscriptions[room].push (message.match[1])
     robot.brain.set('mqtt-subscriptions',subscriptions)
     robot.brain.save
-    message.send("#{room} subscribed to #{topic}")
 
   robot.respond /mqtt unsubscribe (.*)/i, (message) ->
     topic = message.match[1]
     room = message.message.room
     mqttClient.unsubscribe(topic)
+    message.send("#{room} unsubscribed from #{topic}")
     if ! subscriptions[room]?
       subscriptions[room] = []
     index = subscriptions[room].indexOf(topic)
     subscriptions[room].splice(index,1) unless index == -1
     robot.brain.set('mqtt-subscriptions',subscriptions)
     robot.brain.save
-    message.send("#{room} unsubscribed from #{topic}")
 
   robot.respond /mqtt\s+publish\s+(\S+)\s+(.*)/i, (message) ->
     mqttClient.publish( message.match[1], message.match[2] )
+    message.send("message #{message.match[2]}, published to [#{message.match[1]}]")
 
   robot.respond /mqtt reconnect/i, (message) ->
     mqttClient = mqtt.connect(process.env.HUBOT_MQTT_URL, options)
