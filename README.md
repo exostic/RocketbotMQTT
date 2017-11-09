@@ -87,14 +87,16 @@ to including all scripts.**
 
 [npmjs]: https://www.npmjs.com
 
-## Rocket.chat
+
+### Rocket.chat
 
 This hubot uses Rocketchat adapter to interact with users.
 Configure your Rocketchat user ( bot ) in launch.sh or in rocketbot-mqtt.json
 
+
 ### MQTT Client
 
-Client config takes place inside init files. 
+Client configuration takes place inside init files. 
 
 For just plaintext you'll want the following in your environmnet, and to block comment out the options involving SSL
 
@@ -117,7 +119,7 @@ For a custom mosquitto server with client cert authentication you'll want (and o
 	export HUBOT_MQTT_CLIENT_KEY='/etc/ssl/private/localhost.ckey'
 	export HUBOT_MQTT_CLIENT_CERT='/etc/ssl/certs/localhost.crt'
 
-## Deploy
+### Deploy
 
 Start with rocketbot-mqtt.json.sample to configure your instance of rocketbot and save the file as rocketbot-mqtt.json
 Then init with pm2 start rocketbot-mqtt.json
