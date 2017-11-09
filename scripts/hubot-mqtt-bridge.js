@@ -20,45 +20,53 @@ const fs = require('fs');
 const mqtt = require('mqtt');
 const mqttPattern = require("mqtt-pattern");
 
-const mqttUrl = process.env.HUBOT_MQTT_URL;
+const MQTT_URL = process.env.HUBOT_MQTT_URL;
 const HOST = process.env.HUBOT_MQTT_HOST;
 const PORT = process.env.HUBOT_MQTT_PORT;
+const CLIENT_ID = process.env.HUBOT_MQTT_CLIENT_ID;
+const USERNAME = process.env.HUBOT_MQTT_USERNAME;
+//const PASSWORD = new Buffer(process.env.HUBOT_MQTT_PASSWORD);
+const PASSWORD = new Buffer('password');
+
 // block comment out the rest of this block if no tls
-//ca_file          = process.env.HUBOT_MQTT_CA_CERT
+ca_file = process.env.HUBOT_MQTT_CA_CERT;
 // block comment out the rest of these varibles if no client_cert auth
 //client_key_file  = process.env.HUBOT_MQTT_CLIENT_KEY
 //client_cert_file = process.env.HUBOT_MQTT_CLIENT_CERT
-//TRUSTED_CA_LIST  = fs.readFileSync("#{ca_file}")
+TRUSTED_CA_LIST  = fs.readFileSync(ca_file);
 //KEY              = fs.readFileSync("#{client_key_file}")
 //CERT             = fs.readFileSync("#{client_cert_file}")
 
-
 const mqttOptions = {
-  protocolId: 'MQIsdp',
-  protocolVersion: 3,
+//  protocolId: 'MQIsdp',
+  protocolId: 'MQTT',
+//  protocolVersion: 3,
+  protocolVersion: 4,
   host: HOST,
-  port: PORT
-};
-//  username: 'varda'
-//  password: new Buffer('varda')
+  port: PORT,
+  clientId : CLIENT_ID,
+  username : USERNAME,
+  password : PASSWORD,
+//  password: new Buffer('varda'),
 // block comment out the rest of thes if no tls
-//  ca: TRUSTED_CA_LIST
-//  rejectUnauthorized: true
+  ca: TRUSTED_CA_LIST,
+  rejectUnauthorized: false,
 // block comment out the rest of these if no client_cert auth
-//  protocol: 'mqtts'
-//  secureProtocol: 'TLSv1_method'
-//  key: KEY
-//  cert: CERT
+//  protocol: 'mqtts',
+//  secureProtocol: 'TLSv1_method',
+//  key: KEY,
+//  cert: CERT,
 //  ciphers: 'ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-RSA-RC4-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES128-SHA:AES256-SHA256:AES256-SHA:RC4-SHA:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS:!EDH'
+};
 
-let mqttClient = mqtt.connect(mqttUrl, mqttOptions);
+let mqttClient = mqtt.connect(MQTT_URL, mqttOptions);
 
 mqttClient.on('connect', () => console.log(`Connected to MQTT broker @ ${process.env.HUBOT_MQTT_HOST}:${process.env.HUBOT_MQTT_PORT}`));
 
-const outTopic = process.env.HUBOT_MQTT_OUT_TOPIC;
-const inTopic = process.env.HUBOT_MQTT_IN_TOPIC;
+const OUT_TOPIC = process.env.HUBOT_MQTT_OUT_TOPIC;
+const IN_TOPIC = process.env.HUBOT_MQTT_IN_TOPIC;
 
-mqttClient.subscribe(outTopic);
+mqttClient.subscribe(OUT_TOPIC);
 
 module.exports = function(robot) {
 
@@ -72,34 +80,37 @@ module.exports = function(robot) {
     return req.send("I heard the keyword, am I right?");
   });
 
-// Utilities
-
   robot.respond(/show room/, res => res.reply(`The room's ID is ${res.message.room}.`));
 
 // MQTT Bridge 
 
-  let subscriptions = robot.brain.get('mqtt-subscriptions');
-  if (subscriptions != null) {
-    for (room in subscriptions) {
-      topics = subscriptions[room];
-      for (itopic in topics) {
-        mqttClient.subscribe(topics[itopic]);
-      }
-    }
-  }
-  if ((subscriptions == null)) {
-    subscriptions = {};
-    subscriptions[outTopic] = [];
-  }
-  if (typeof topic !== 'undefined' && topic !== null) {
-    subscriptions[outTopic].push(topic); // subscribe to the initial env topic if given
-  }
- 
-  mqttClient.on('message', function(topic,message) {
-    robot.messageRoom(outTopic, `received ${message} from [${topic}]`);
+  const getParams = function(topic) {
     const pattern = "hermes/intent/+intentName/#data";
     const params = mqttPattern.exec(pattern, topic);
     console.log(`Intent Received ${params.intentName}`);
+    robot.brain.set('mqtt-pattern',params);
+    return robot.brain.save;
+  };
+
+  const filterPayload = function(topic) {
+    if (params[data] != null) {
+      switch (params[data]) {
+        case "weatherForecastLocality" :
+          break;
+      }
+      return message.send(`Message filtré : [ ` + params[data].join(', ') + " ]");
+    } else {
+      return message.send("Could not filter data");
+    }
+  }
+ 
+  mqttClient.on('message', function(topic,message) {
+
+    console.log(`received ${message} from [${topic}]`);
+    //robot.messageRoom(OUT_TOPIC, `received ${message} from [${topic}]`);
+    //getParams(topic);
+    //  case ""
+    //}
     return (() => {
       const result = [];
       for (room in subscriptions) {
@@ -122,7 +133,24 @@ module.exports = function(robot) {
     })();
   });
 
-// MQTT Control
+// MQTT Hubot Control
+
+  let subscriptions = robot.brain.get('mqtt-subscriptions');
+  if (subscriptions != null) {
+    for (room in subscriptions) {
+      topics = subscriptions[room];
+      for (itopic in topics) {
+        mqttClient.subscribe(topics[itopic]);
+      }
+    }
+  }
+  if ((subscriptions == null)) {
+    subscriptions = {};
+    subscriptions[OUT_TOPIC] = [];
+  }
+  if (typeof topic !== 'undefined' && topic !== null) {
+    subscriptions[OUT_TOPIC].push(topic); // subscribe to the initial env topic if given
+  }
 
   robot.respond(/mqtt subscribe (.*)/i, function(message) {
     ({ room } = message.message);
