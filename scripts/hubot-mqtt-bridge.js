@@ -41,7 +41,6 @@ TRUSTED_CA_LIST  = fs.readFileSync(ca_file);
 const mqttOptions = {
 //  protocolId: 'MQIsdp',
   protocolId: 'MQTT',
-//  protocolVersion: 3,
   protocolVersion: 4,
   host: host,
   port: port,
@@ -209,7 +208,7 @@ module.exports = function(robot) {
     return message.send(`message ${message.match[2]}, published to [${message.match[1]}]`);
   });
 
-  robot.respond(/mqtt reconnect/i, message => mqttClient = mqtt.connect(process.env.HUBOT_MQTT_URL, options));
+  robot.respond(/mqtt reconnect/i, message =>  mqttClient = mqtt.connect(mqttUrl, mqttOptions));
 
   return robot.respond(/mqtt (subscriptions|subscribed|topics)/i, function(message) {
     ({ room } = message.message);
