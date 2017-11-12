@@ -94,7 +94,7 @@ This hubot uses Rocketchat adapter to interact with users.
 Configure your Rocketchat user ( bot ) in launch.sh or in rocketbot-mqtt.json
 
 
-### MQTT Client
+### MQTT Client
 
 Client configuration takes place inside init files. 
 
@@ -122,4 +122,5 @@ For a custom mosquitto server with client cert authentication you'll want (and o
 ### Deploy
 
 Start with rocketbot-mqtt.json.sample to configure your instance of rocketbot and save the file as rocketbot-mqtt.json
-Then init with pm2 start rocketbot-mqtt.json
+Then init with : 
+	pm2 start rocketbot-mqtt.json
