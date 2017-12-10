@@ -50,7 +50,7 @@ const mqttOptions = {
 //  password: new Buffer('varda'),
 // block comment out the rest of thes if no tls
 //  ca: TRUSTED_CA_LIST,
-  rejectUnauthorized: false,
+//  rejectUnauthorized: false,
 // block comment out the rest of these if no client_cert auth
 //  protocol: 'mqtts',
 //  secureProtocol: 'TLSv1_method',

@@ -5,7 +5,7 @@
                 "log_date_format": "YYYY-MM-DD HH:mm:ss SSS",
                 "script": "launch.sh",
                 "exec_interpreter": "bash",
-                "args": "--name rocketcat --adapter rocketchat",
+                "args": "--name rocketbot-mqtt --adapter rocketchat",
                 "watch": ["package.json", "external-scripts.json", "scripts/"],
                 "out_file": "logs/app.log",
                 "error_file": "logs/err.log",
