@@ -33,5 +33,5 @@ bin
 pm2.json
 
 launch.sh
-
+RocketbotMQTT.json
 .DS_Store

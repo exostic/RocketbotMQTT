@@ -1,0 +1,40 @@
+{
+        "apps": [{
+                "name": "RocketbotMQTT",
+                "interpreter": "/bin/bash",
+                "watch": true,
+                "max_memory_restart": "512M",
+                "ignore_watch" : ["client/img"],
+                "script": "bin/hubot",
+                "args": "-a rocketchat",
+                "port": "8079",
+                "env": {
+                        "ROCKETCHAT_URL": "https://chat.aloes.io",
+                        "ROCKETCHAT_ROOM": "logs",
+                        "RESPOND_TO_DM": true,
+                        "RESPOND_TO_LIVECHAT": false,
+                        "LISTEN_ON_ALL_PUBLIC": true,
+			"WELCOME_MESSAGE": "Hey!",
+			"DIRECT_WELCOME": false,
+			"GLOBAL_WELCOME": false,
+                        "ROCKETCHAT_USER": "dave",
+                        "ROCKETCHAT_PASSWORD": "",
+                        "ROCKETCHAT_AUTH": "password",
+                        "HUBOT_LOG_LEVEL": "debug",
+                        "HUBOT_LANG": "fr",
+			"HUBOT_MQTT_URL": "mqtt://server2.getlarge.eu:1884",
+			"HUBOT_MQTT_HOST": "server2.getlarge.eu",
+			"HUBOT_MQTT_PORT": "1884",
+			"HUBOT_MQTT_CLIENT_ID": "",
+			"HUBOT_MQTT_USERNAME": "",
+			"HUBOT_MQTT_PASSWORD": "",
+			"HUBOT_MQTT_CA_CERT": "certs/DST_Root_CA_X3.pem",
+			"HUBOT_MQTT_OUT_TOPIC": "logs",
+			"HUBOT_MQTT_IN_TOPIC": "logs",
+
+                }
+        }
+]
+}
+
+
